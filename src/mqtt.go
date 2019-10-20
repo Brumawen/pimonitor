@@ -102,11 +102,11 @@ func (m *Mqtt) SendTelemetry(s gopifinder.DeviceStatus) error {
 		return token.Error()
 	}
 
-	// freedisk
-	m.logInfo("Publishing freedisk =", fmt.Sprintf("%d", s.DiskUsedPerc))
-	token = m.client.Publish(fmt.Sprintf("home/%s/freedisk", s.HostName), byte(0), true, fmt.Sprintf("%d", s.DiskUsedPerc))
+	// diskused
+	m.logInfo("Publishing diskused =", fmt.Sprintf("%d", s.DiskUsedPerc))
+	token = m.client.Publish(fmt.Sprintf("home/%s/diskused", s.HostName), byte(0), true, fmt.Sprintf("%d", s.DiskUsedPerc))
 	if token.Wait() && token.Error() != nil {
-		m.logError("Error publishing freedisk to MQTT Broker.", token.Error())
+		m.logError("Error publishing diskused to MQTT Broker.", token.Error())
 		return token.Error()
 	}
 
