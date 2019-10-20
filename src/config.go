@@ -10,7 +10,6 @@ import (
 
 // Config holds the configuration required for the Service
 type Config struct {
-	DeviceName   string `json:"deviceName"`   // Name of this device
 	Period       int    `json:"period"`       // Cloud update period (in minutes)
 	EnableMqtt   bool   `json:"enableMqtt"`   // Enable MQTT integration
 	MqttHost     string `json:"mqttHost"`     // MQTT Host

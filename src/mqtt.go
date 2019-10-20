@@ -96,7 +96,7 @@ func (m *Mqtt) SendTelemetry(s gopifinder.DeviceStatus) error {
 
 	// cputemp
 	m.logInfo("Publishing cputemp =", fmt.Sprintf("%.1f", s.CPUTemp))
-	token := m.client.Publish(fmt.Sprintf("home/%s/cputemp", m.Srv.Config.DeviceName), byte(0), true, fmt.Sprintf("%.1f", s.CPUTemp))
+	token := m.client.Publish(fmt.Sprintf("home/%s/cputemp", s.HostName), byte(0), true, fmt.Sprintf("%.1f", s.CPUTemp))
 	if token.Wait() && token.Error() != nil {
 		m.logError("Error publishing cputemp to MQTT Broker.", token.Error())
 		return token.Error()
@@ -104,7 +104,7 @@ func (m *Mqtt) SendTelemetry(s gopifinder.DeviceStatus) error {
 
 	// freedisk
 	m.logInfo("Publishing freedisk =", fmt.Sprintf("%d", s.FreeDiskPerc))
-	token = m.client.Publish(fmt.Sprintf("home/%s/freedisk", m.Srv.Config.DeviceName), byte(0), true, fmt.Sprintf("%d", s.FreeDiskPerc))
+	token = m.client.Publish(fmt.Sprintf("home/%s/freedisk", s.HostName), byte(0), true, fmt.Sprintf("%d", s.FreeDiskPerc))
 	if token.Wait() && token.Error() != nil {
 		m.logError("Error publishing freedisk to MQTT Broker.", token.Error())
 		return token.Error()
@@ -116,7 +116,7 @@ func (m *Mqtt) SendTelemetry(s gopifinder.DeviceStatus) error {
 		v = 1
 	}
 	m.logInfo("Publishing isthrottled =", fmt.Sprintf("%d", v))
-	token = m.client.Publish(fmt.Sprintf("home/%s/isthrottled", m.Srv.Config.DeviceName), byte(0), true, fmt.Sprintf("%d", v))
+	token = m.client.Publish(fmt.Sprintf("home/%s/isthrottled", s.HostName), byte(0), true, fmt.Sprintf("%d", v))
 	if token.Wait() && token.Error() != nil {
 		m.logError("Error publishing isthrottled to MQTT Broker.", token.Error())
 		return token.Error()
