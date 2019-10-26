@@ -110,6 +110,15 @@ func (m *Mqtt) SendTelemetry(s gopifinder.DeviceStatus) error {
 		return token.Error()
 	}
 
+	// memused
+	mu := float64(s.TotalMem-s.AvailMem) / float64(s.TotalMem) * float64(100)
+	m.logInfo("Publishing memused =", fmt.Sprintf("%.1f", mu))
+	token = m.client.Publish(fmt.Sprintf("home/%s/memused", s.HostName), byte(0), true, fmt.Sprintf("%.1f", mu))
+	if token.Wait() && token.Error() != nil {
+		m.logError("Error publishing memused to MQTT Broker.", token.Error())
+		return token.Error()
+	}
+
 	// isthrottled
 	v := 0
 	if s.IsThrottled {
