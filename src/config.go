@@ -15,6 +15,7 @@ type Config struct {
 	MqttHost     string `json:"mqttHost"`     // MQTT Host
 	MqttUsername string `json:"mqttUsername"` // MQTT Username
 	MqttPassword string `json:"mqttPassword"` // MQTT password
+	UseUtcDate   bool   `json:"useUtcDate"`   // Use Utc date
 }
 
 // ReadFromFile will read the configuration settings from the specified file

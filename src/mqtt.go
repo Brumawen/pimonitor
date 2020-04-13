@@ -42,7 +42,7 @@ func (m *Mqtt) Initialize() error {
 	}
 
 	// Connect and send meta information
-	m.logInfo("Connecting to the MQTT Broker.")
+	m.logInfo("Connecting to the MQTT Broker ", m.Srv.Config.MqttHost)
 	m.ignoreCommands = true
 
 	opts := MQTT.NewClientOptions()
@@ -51,15 +51,15 @@ func (m *Mqtt) Initialize() error {
 	opts.SetPassword(m.Srv.Config.MqttPassword)
 
 	opts.SetConnectionLostHandler(func(client MQTT.Client, err error) {
-		m.logError("Disconnected from MQTT Broker.", err.Error())
+		m.logError("Disconnected from MQTT Broker. ", err.Error())
 	})
 	opts.SetOnConnectHandler(func(client MQTT.Client) {
-		m.logInfo("Connected to the MQTT Broker. ")
+		m.logInfo("Connected to the MQTT Broker.")
 	})
 
 	m.client = MQTT.NewClient(opts)
 	if token := m.client.Connect(); token.Wait() && token.Error() != nil {
-		m.logError("Error connecting to MQTT Broker.", token.Error())
+		m.logError("Error connecting to MQTT Broker. ", token.Error())
 		return token.Error()
 	}
 
@@ -83,39 +83,48 @@ func (m *Mqtt) SendTelemetry(s gopifinder.DeviceStatus) error {
 		return nil
 	}
 
-	m.logInfo("Publishing telemetry to MQTT")
+	m.logInfo("Publishing telemetry to MQTT for host name ", s.HostName)
 	m.LastUpdateAttempt = time.Now()
 
 	if !m.client.IsConnected() {
 		m.logInfo("Reconnecting to MQTT broker")
 		if token := m.client.Connect(); token.Wait() && token.Error() != nil {
-			m.logError("Error connecting to MQTT Broker.", token.Error())
+			m.logError("Error connecting to MQTT Broker. ", token.Error())
 			return token.Error()
 		}
 	}
 
-	// cputemp
-	m.logInfo("Publishing cputemp =", fmt.Sprintf("%.1f", s.CPUTemp))
-	token := m.client.Publish(fmt.Sprintf("home/%s/cputemp", s.HostName), byte(0), true, fmt.Sprintf("%.1f", s.CPUTemp))
+	// date
+	cd := time.Now().UTC()
+	m.logInfo("Publishing current date ", cd.Format("2006-01-02 15:04:05"))
+	token := m.client.Publish(fmt.Sprintf("home/%s/lastdate", s.HostName), byte(0), true, cd.Format("2006-01-02 15:04:05"))
 	if token.Wait() && token.Error() != nil {
-		m.logError("Error publishing cputemp to MQTT Broker.", token.Error())
+		m.logError("Error publishing cputemp to MQTT Broker. ", token.Error())
+		return token.Error()
+	}
+
+	// cputemp
+	m.logInfo("Publishing cputemp = ", fmt.Sprintf("%.1f", s.CPUTemp))
+	token = m.client.Publish(fmt.Sprintf("home/%s/cputemp", s.HostName), byte(0), true, fmt.Sprintf("%.1f", s.CPUTemp))
+	if token.Wait() && token.Error() != nil {
+		m.logError("Error publishing cputemp to MQTT Broker. ", token.Error())
 		return token.Error()
 	}
 
 	// diskused
-	m.logInfo("Publishing diskused =", fmt.Sprintf("%d", s.DiskUsedPerc))
+	m.logInfo("Publishing diskused = ", fmt.Sprintf("%d", s.DiskUsedPerc))
 	token = m.client.Publish(fmt.Sprintf("home/%s/diskused", s.HostName), byte(0), true, fmt.Sprintf("%d", s.DiskUsedPerc))
 	if token.Wait() && token.Error() != nil {
-		m.logError("Error publishing diskused to MQTT Broker.", token.Error())
+		m.logError("Error publishing diskused to MQTT Broker. ", token.Error())
 		return token.Error()
 	}
 
 	// memused
 	mu := float64(s.TotalMem-s.AvailMem) / float64(s.TotalMem) * float64(100)
-	m.logInfo("Publishing memused =", fmt.Sprintf("%.1f", mu))
+	m.logInfo("Publishing memused = ", fmt.Sprintf("%.1f", mu))
 	token = m.client.Publish(fmt.Sprintf("home/%s/memused", s.HostName), byte(0), true, fmt.Sprintf("%.1f", mu))
 	if token.Wait() && token.Error() != nil {
-		m.logError("Error publishing memused to MQTT Broker.", token.Error())
+		m.logError("Error publishing memused to MQTT Broker. ", token.Error())
 		return token.Error()
 	}
 
