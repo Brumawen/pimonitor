@@ -14,7 +14,7 @@ require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/kr/pretty v0.2.1 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
-	golang.org/x/net v0.27.0 // indirect
+	golang.org/x/net v0.36.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
 )
