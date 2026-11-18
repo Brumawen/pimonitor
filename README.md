@@ -2,7 +2,7 @@
 
 Microservice that monitors the Raspberry Pi it runs on and reports the metrics over MQTT.
 
-Build with Go 1.23 or later, from the `src` directory. The Pi does not need Go installed if you copy a finished binary onto it.
+Build with Go 1.25 or later, from the `src` directory. The Pi does not need Go installed if you copy a finished binary onto it.
 
 ## Build
 
