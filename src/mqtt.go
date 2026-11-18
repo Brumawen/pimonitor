@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	gopifinder "github.com/brumawen/gopi-finder/src"
@@ -111,6 +112,14 @@ func (m *Mqtt) SendTelemetry(s gopifinder.DeviceStatus) error {
 		return token.Error()
 	}
 
+	// gputemp
+	m.logInfo("Publishing gputemp = ", fmt.Sprintf("%.1f", s.GPUTemp))
+	token = m.client.Publish(fmt.Sprintf("home/%s/gputemp", s.HostName), byte(0), true, fmt.Sprintf("%.1f", s.GPUTemp))
+	if token.Wait() && token.Error() != nil {
+		m.logError("Error publishing gputemp to MQTT Broker. ", token.Error())
+		return token.Error()
+	}
+
 	// diskused
 	m.logInfo("Publishing diskused = ", fmt.Sprintf("%d", s.DiskUsedPerc))
 	token = m.client.Publish(fmt.Sprintf("home/%s/diskused", s.HostName), byte(0), true, fmt.Sprintf("%d", s.DiskUsedPerc))
@@ -137,6 +146,23 @@ func (m *Mqtt) SendTelemetry(s gopifinder.DeviceStatus) error {
 	token = m.client.Publish(fmt.Sprintf("home/%s/isthrottled", s.HostName), byte(0), true, fmt.Sprintf("%d", v))
 	if token.Wait() && token.Error() != nil {
 		m.logError("Error publishing isthrottled to MQTT Broker.", token.Error())
+		return token.Error()
+	}
+
+	// model and version
+	model := strings.TrimSpace(fmt.Sprintf("%s %s", s.HWType, s.OSVersion))
+	m.logInfo("Publishing model = ", model)
+	token = m.client.Publish(fmt.Sprintf("home/%s/model", s.HostName), byte(0), true, model)
+	if token.Wait() && token.Error() != nil {
+		m.logError("Error publishing model to MQTT Broker. ", token.Error())
+		return token.Error()
+	}
+
+	// osname
+	m.logInfo("Publishing osname = ", s.OSName)
+	token = m.client.Publish(fmt.Sprintf("home/%s/osname", s.HostName), byte(0), true, s.OSName)
+	if token.Wait() && token.Error() != nil {
+		m.logError("Error publishing osname to MQTT Broker. ", token.Error())
 		return token.Error()
 	}
 
